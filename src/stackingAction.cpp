@@ -14,19 +14,26 @@ G4ClassificationOfNewTrack stackingAction::ClassifyNewTrack(const G4Track* newTr
 
   G4ClassificationOfNewTrack classification = fWaiting;
 
+  G4double photonWavelength = utilityFunctions::evToLambda(newTrack->GetTotalEnergy());
+
   if(newTrack->GetDefinition()->GetParticleName() == "opticalphoton")
   {
     if(newTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov")
     {
-      G4double cerenkovPhotonWavelength = sensitiveDetector::evToLambda(newTrack->GetTotalEnergy());
+      //G4double angleOfEmission = utilityFunctions::getCerenkovAngleOfEmission(1.5, newTrack->CalculateVelocityForOpticalPhoton());
+      G4ThreeVector currentPosition = newTrack->GetPosition();
+      G4cout << newTrack->GetMomentumDirection()[1] << G4endl;
+
       man->FillH1(2, currentEvent);
-      man->FillH1(3, cerenkovPhotonWavelength);
+      man->FillH1(3, photonWavelength);
+      //man->FillH1(9, angleOfEmission);
+      man->FillH1(6, currentPosition[2]);
+
     }
-    if(newTrack->GetCreatorProcess()->GetProcessName() == "Scintillation")
+    else if(newTrack->GetCreatorProcess()->GetProcessName() == "Scintillation")
     {
-      G4double scintillationPhotonWavelength = sensitiveDetector::evToLambda(newTrack->GetTotalEnergy());
-      man->FillH1(6, scintillationPhotonWavelength);
-      man->FillH1(5, currentEvent);
+      man->FillH1(5, photonWavelength);
+      man->FillH1(4, currentEvent);
     }
 
   }

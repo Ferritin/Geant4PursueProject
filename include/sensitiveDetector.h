@@ -9,7 +9,7 @@
 #include "G4AnalysisManager.hh"
 #include "G4SystemOfUnits.hh"
 #include "G4ThreeVector.hh"
-
+#include "utilityFunctions.h"
 
 class G4Step;
 
@@ -19,15 +19,10 @@ class sensitiveDetector : public G4VSensitiveDetector
       sensitiveDetector(const G4String&);
      ~sensitiveDetector();
 
-     //Utility functions
-     //Input energy, outputs lambda (in nm)
-     static G4double evToLambda(G4double eV);
-
-
      virtual void Initialize(G4HCofThisEvent*);
      virtual G4bool ProcessHits(G4Step*, G4TouchableHistory *ROhist);
      virtual void EndOfEvent(G4HCofThisEvent*);
 
  private:
-      
+
 };

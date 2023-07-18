@@ -27,7 +27,7 @@ void ParticleGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   //Sets energy and momentum direction and position
   particleGun->SetParticleEnergy(1.*CLHEP::GeV);
   particleGun->SetParticleMomentumDirection(G4ThreeVector(0.0,0,1.0));
-  particleGun->SetParticlePosition(G4ThreeVector(0.0,0.0,0.0));
+  particleGun->SetParticlePosition(G4ThreeVector(0.0,0.0,10));
 
   //Generates the particle
   particleGun->GeneratePrimaryVertex(anEvent);

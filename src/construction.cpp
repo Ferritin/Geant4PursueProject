@@ -23,9 +23,8 @@ void testDetector::ConstructSDandField()
   G4SDManager* SDman = G4SDManager::GetSDMpointer();
 
   G4String photonSDname = "PhotonDetector";
-  sensitiveDetector* photonSD =
-    new sensitiveDetector(photonSDname);
-  SDman->AddNewDetector( photonSD );
+  sensitiveDetector* photonSD = new sensitiveDetector(photonSDname);
+  SDman->AddNewDetector(photonSD);
 
 
   //Retrieves auxiliary information for the sensitive detector

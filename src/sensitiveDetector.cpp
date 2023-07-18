@@ -9,25 +9,6 @@ sensitiveDetector::~sensitiveDetector()
 {
 }
 
-/*
-
-Method originally written by Hans Wenzel,
-https://github.com/hanswenzel/LArProperties/blob/main/scripts/Cerenkov.C
-
-Modified so that energy input is MeV instead of eV
-*/
-G4double sensitiveDetector::evToLambda(G4double MeV)
-{
-  G4double h = 4.13566743E-15;
-  G4double c = 299792458.;
-
-  //Converts MeV to eV
-  G4double eV = MeV * (1.e+6);
-
-  double lambda = (h*c)/(eV * 1.e-9);
-  return lambda;
-}
-
 void sensitiveDetector::Initialize(G4HCofThisEvent*)
 {
 }
@@ -38,6 +19,8 @@ G4bool sensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist)
   //Gets current track, stores name of the particle
   G4Track *track = aStep->GetTrack();
   std::string particleName = track->GetDefinition()->GetParticleName();
+
+  std::string volumeName = aStep->GetPreStepPoint()->GetTouchable()->GetVolume()->GetName();
 
 
   if(particleName == "opticalphoton")
@@ -50,25 +33,36 @@ G4bool sensitiveDetector::ProcessHits(G4Step *aStep, G4TouchableHistory *ROhist)
     //Creates analysis manager
     G4AnalysisManager *man = G4AnalysisManager::Instance();
 
-    //Stores information regarding quantity of Cerenkov vs Scintillation photons detected by SD in an Ntuple
+    //Records photon wavelength
+    G4double photonWavelength = utilityFunctions::evToLambda(preStepPoint->GetTotalEnergy());
+
+    G4ThreeVector currentPosition = track->GetPosition();
+    //Records position of Photons as it hits SD 1 or 2, separating by Cerenkov and Scintillation
     if(creatorProcess == "Cerenkov")
     {
-      man->FillNtupleDColumn(0, 0, eventID);
-      man->AddNtupleRow(0);
+      if(volumeName == "SD1")
+      {
+        man->FillH2(0, currentPosition[0], currentPosition[1]);
+        man->FillH1(7, photonWavelength);
+      }
+      if(volumeName == "SD2")
+      {
+        man->FillH2(2, currentPosition[0], currentPosition[1]);
+        man->FillH1(8, photonWavelength);
+      }
     }
     else if(creatorProcess == "Scintillation")
     {
-      man->FillNtupleDColumn(1, 0, eventID);
-      man->AddNtupleRow(1);
-    }
-
-    G4double photonWavelength = evToLambda(preStepPoint->GetTotalEnergy());
-
-    //Filling out SD Cerenkov Z position histogram
-    if(track->GetCreatorProcess()->GetProcessName() == "Cerenkov")
-    {
-      G4ThreeVector currentPosition = track->GetPosition();
-      man->FillH1(4, currentPosition[2]);
+      if(volumeName == "SD1")
+      {
+        man->FillH2(1, currentPosition[0], currentPosition[1]);
+        man->FillH1(7, photonWavelength);
+      }
+      if(volumeName == "SD2")
+      {
+        man->FillH2(3, currentPosition[0], currentPosition[1]);
+        man->FillH1(8, photonWavelength);
+      }
     }
 
     //Each time a photon hits the SD, the corresponding event ID is incremented
