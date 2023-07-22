@@ -12,6 +12,8 @@ class ParticleGeneratorAction : public G4VUserPrimaryGeneratorAction
 
     void GeneratePrimaries(G4Event* anEvent);
 
+  private:
+    G4ParticleGun* particleGun;
 
 
 };
